@@ -113,3 +113,40 @@ export function extractSkills(text: string): ExtractSkillsResult {
 
   return { skills, byCategory }
 }
+
+export interface SkillCount {
+  /** 技能规范名 */
+  name: string
+  category: SkillCategory
+  /** 在文本中的出现次数（同一位置多个别名命中只计一次） */
+  count: number
+}
+
+/**
+ * 统计文本中各技能关键词的出现次数。
+ * 同一技能的不同别名在同一位置命中时只计一次
+ * （如 "Node.js" 会同时命中 node.js 与 node 别名），不同位置的命中累计。
+ */
+export function countSkills(text: string): SkillCount[] {
+  const result: SkillCount[] = []
+  if (!text || typeof text !== 'string') return result
+
+  for (const skill of COMPILED_SKILLS) {
+    const positions = new Set<number>()
+    for (const regex of skill.regexes) {
+      const globalRegex = new RegExp(regex.source, `${regex.flags}g`)
+      for (const match of text.matchAll(globalRegex)) {
+        positions.add(match.index ?? 0)
+      }
+    }
+    if (positions.size > 0) {
+      result.push({
+        name: skill.name,
+        category: skill.category,
+        count: positions.size,
+      })
+    }
+  }
+
+  return result
+}
