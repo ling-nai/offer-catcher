@@ -7,7 +7,7 @@
  *   可读错误，由调用方引导用户改用粘贴文本。
  */
 
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url'
 
 /** 单个 PDF 文件大小上限（10MB） */
 export const MAX_PDF_SIZE = 10 * 1024 * 1024
@@ -54,13 +54,13 @@ export async function extractPdfText(file: File): Promise<PdfParseResult> {
   let pdfjs: typeof import('pdfjs-dist')
   try {
     // 动态 import：仅在用户上传 PDF 时才加载解析库
-    pdfjs = await import('pdfjs-dist')
+    pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
   } catch {
     throw new PdfParseError('PDF 解析组件加载失败，请检查网络后重试，或直接粘贴简历文本')
   }
   pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
 
-  const loadingTask = pdfjs.getDocument({ data: buffer })
+  const loadingTask = pdfjs.getDocument({ data: new Uint8Array(buffer) })
   let pdf: Awaited<typeof loadingTask.promise>
   try {
     pdf = await loadingTask.promise
