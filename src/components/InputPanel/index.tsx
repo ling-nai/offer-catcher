@@ -12,6 +12,7 @@ import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { matchResumeJd, type MatchResult } from '../../lib/match'
 import { extractPdfText } from '../../lib/pdf'
+import AnalysisReport from '../AnalysisReport'
 
 type PdfStatus =
   | { status: 'idle' }
@@ -181,17 +182,8 @@ export default function InputPanel() {
         )}
       </div>
 
-      {/* 匹配结果（原始 JSON，正式报告组件下一步开发） */}
-      {result && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-            匹配结果（原始 JSON）
-          </h2>
-          <pre className="mt-3 max-h-96 overflow-auto rounded-xl bg-slate-900 p-4 text-xs leading-relaxed text-slate-100 dark:bg-slate-950">
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        </section>
-      )}
+      {/* 匹配结果报告（未分析时由 AnalysisReport 展示空状态引导） */}
+      <AnalysisReport result={result} />
     </div>
   )
 }
